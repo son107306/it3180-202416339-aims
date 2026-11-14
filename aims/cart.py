@@ -25,6 +25,18 @@ class Cart:
     def total_cost(self):
         return sum(dvd.cost for dvd in self.items)
 
+    def print_cart(self):
+        """Print each DVD and the order total."""
+        if not self.items:
+            print("The cart is empty")
+            return
+        print("***********************CART***********************")
+        print("Ordered Items:")
+        for index, disc in enumerate(self.items, start=1):
+            print(f"{index}. {disc}")
+        print(f"Total cost: {self.total_cost():.2f} $")
+        print("***************************************************")
+
 
 def create_cart():
     """Compatibility helper kept for the first iteration of the project."""
