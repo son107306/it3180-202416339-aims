@@ -11,7 +11,7 @@ class Cart:
 
     def add_dvd(self, dvd):
         # The boundary condition is exercised in the Lab 03 bugfix flow.
-        if len(self.items) > MAX_NUMBERS_ORDERED:
+        if len(self.items) >= MAX_NUMBERS_ORDERED:
             return False
         self.items.append(dvd)
         return True
