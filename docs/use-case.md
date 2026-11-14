@@ -1,58 +1,98 @@
-# Lab 02 — AIMS-mini use-case specification
+# Đặc tả ca sử dụng (Use Case Specification) — AIMS-mini
 
-## Actors and scope
+**Học phần:** IT3180 — Nhập môn Công nghệ phần mềm  
+**Sinh viên:** Nguyễn Văn Sơn — MSSV 202416339
 
-**Customer** uses the command-line shopping cart. The mini application has no database, authentication, or checkout/payment gateway.
+## 1. Phạm vi và tác nhân
+
+AIMS-mini là ứng dụng mẫu Python chạy trên dòng lệnh để thực hành quản lý cấu hình phần mềm. Các thao tác dưới đây được cung cấp dưới dạng hàm/phương thức trong `aims/`; `main.py` chỉ trình diễn thêm DVD, tính tiền và in giỏ hàng, **không** phải giao diện tương tác đầy đủ.
+
+- **Khách hàng:** thực hiện các nghiệp vụ giỏ hàng và tra cứu DVD.
+- **Quản trị viên (minh họa):** có thể tra cứu theo danh mục/tiêu đề trong mô hình ca sử dụng. Chương trình hiện chưa có đăng nhập hoặc phân quyền quản trị.
+
+## 2. Biểu đồ Use Case tổng quan
 
 ```mermaid
 flowchart LR
-    C((Customer))
-    subgraph AIMS-mini
-        UC1[Add DVD to cart]
-        UC2[Remove DVD from cart]
-        UC3[Print cart]
-        UC4[Calculate total]
-        UC5[Search by title]
+    Customer((Khách hàng))
+    Admin((Quản trị viên))
+
+    subgraph AIMS_Mini["Hệ thống AIMS-mini"]
+        UC01["UC01: Thêm DVD vào giỏ hàng"]
+        UC02["UC02: Xóa DVD khỏi giỏ hàng"]
+        UC03["UC03: Xem chi tiết giỏ hàng"]
+        UC04["UC04: Tính tổng tiền và giảm giá"]
+        UC05["UC05: Tìm DVD theo tiêu đề"]
+        UC06["UC06: Tìm DVD theo thể loại"]
+        UC07["UC07: Sắp xếp giỏ hàng"]
     end
-    C --> UC1
-    C --> UC2
-    C --> UC3
-    C --> UC4
-    C --> UC5
+
+    Customer --> UC01
+    Customer --> UC02
+    Customer --> UC03
+    Customer --> UC04
+    Customer --> UC05
+    Customer --> UC06
+    Customer --> UC07
+
+    Admin --> UC05
+    Admin --> UC06
 ```
 
-## UC01 — Add DVD
+## 3. Đặc tả các ca sử dụng
 
-**Precondition:** A cart instance exists and a valid DVD has been selected.
+### UC01 — Thêm DVD vào giỏ hàng
 
-**Main flow:** Customer selects DVD → system checks the 20-item limit → system adds the DVD → returns success.
+- **Tác nhân:** Khách hàng.
+- **Tiền điều kiện:** Có đối tượng `Cart` và `DigitalVideoDisc` hợp lệ.
+- **Luồng chính:** Gọi `Cart.add_dvd(dvd)`; nếu số đĩa nhỏ hơn `MAX_NUMBERS_ORDERED = 20`, thêm DVD, in thông báo `Đã thêm đĩa vào giỏ hàng` và trả về `True`.
+- **Ngoại lệ:** Khi giỏ đã có 20 đĩa, trả về `False`; không thêm DVD thứ 21.
 
-**Alternate flow:** When the cart already contains 20 DVDs, return `False` without modifying `items`.
+### UC02 — Xóa DVD khỏi giỏ hàng
 
-**Postcondition:** The DVD is added exactly once if successful.
+- **Tác nhân:** Khách hàng.
+- **Luồng chính:** Gọi `Cart.remove_dvd(dvd)`; nếu đĩa tồn tại, xóa khỏi `items` và trả về `True`.
+- **Ngoại lệ:** Không có DVD cần xóa: trả về `False`, danh sách không đổi.
 
-## UC02 — Remove DVD
+### UC03 — Hiển thị chi tiết giỏ hàng
 
-**Precondition:** A cart exists.
+- **Tác nhân:** Khách hàng.
+- **Luồng chính:** `Cart.print_cart()` in danh sách theo thứ tự, thông tin DVD và tổng tiền với hai chữ số thập phân.
+- **Ngoại lệ:** Giỏ rỗng: in `The cart is empty`.
 
-**Main flow:** Customer selects a DVD currently in cart → system removes it → returns `True`.
+### UC04 — Tính tổng tiền và giảm giá
 
-**Alternate flow:** DVD absent → returns `False`, list unchanged.
+- **Tác nhân:** Khách hàng.
+- **Luồng chính:** `Cart.total_cost()` cộng chi phí các DVD. `Cart.total_cost_with_discount(percent)` trả về `total × (100 - percent) / 100`.
+- **Điều kiện hợp lệ:** `0 ≤ percent ≤ 100`.
+- **Ngoại lệ:** Tỷ lệ nằm ngoài khoảng này: phát sinh `ValueError`. Giỏ rỗng có tổng tiền bằng 0.
 
-## UC03 — Print cart
+### UC05 — Tìm kiếm DVD theo tiêu đề
 
-**Main flow:** System prints ordered DVDs and total cost.
+- **Tác nhân:** Khách hàng; Quản trị viên (mô hình).
+- **Luồng chính:** `search_by_title(items, keyword)` trả về các DVD có tiêu đề chứa từ khóa, không phân biệt hoa/thường.
+- **Ngoại lệ:** Từ khóa rỗng trả về bản sao toàn bộ danh sách; từ khóa không phải chuỗi phát sinh `TypeError`.
 
-**Alternate flow:** Empty cart → print `The cart is empty`.
+### UC06 — Tìm kiếm DVD theo thể loại
 
-## UC04 — Calculate total
+- **Tác nhân:** Khách hàng; Quản trị viên (mô hình).
+- **Luồng chính:** `search_by_category(items, category)` lọc theo chuỗi con trong `dvd.category` và không phân biệt hoa/thường.
+- **Ngoại lệ:** Chuỗi rỗng trả về bản sao danh sách; đầu vào không phải chuỗi phát sinh `TypeError`.
 
-Sum the costs of all items. An empty cart has total 0.0.
+### UC07 — Sắp xếp giỏ hàng
 
-## UC05 — Search by title
+- **Tác nhân:** Khách hàng.
+- **Theo tên:** `Cart.sort_by_title()` sắp xếp tiêu đề tăng dần không phân biệt hoa/thường; nếu trùng tên, giá giảm dần.
+- **Theo giá:** `Cart.sort_by_cost()` sắp xếp giá giảm dần; nếu trùng giá, tên tăng dần.
+- **Hậu điều kiện:** Các thao tác thay đổi thứ tự `Cart.items` ngay trên giỏ, không thêm hoặc xóa DVD.
 
-Compare substring without distinguishing uppercase/lowercase. Return all matches without mutating the original list; empty keyword lists all items.
+## 4. Liên hệ mã nguồn và kiểm thử
 
-## Change-control note
+| Thành phần | Chức năng | Kiểm thử |
+|---|---|---|
+| `aims/cart.py` | UC01, UC02, UC03, UC04, UC07 | `tests/test_cart.py`, `test_discount.py`, `test_sort.py` |
+| `aims/search.py` | UC05, UC06 | `tests/test_search.py`, `test_category.py` |
+| `aims/dvd.py` | Dữ liệu DVD, giá không âm và hữu hạn | `tests/test_dvd.py` |
+| `main.py` | Chương trình demo | `python main.py` — tổng 63.89 USD |
 
-Use this specification to validate PRs implementing each feature. Any difference between current code and expected alternate flow must be tracked as a test/fix rather than silently treated as complete.
+**Lưu ý:** Đây là sơ đồ chức năng của mô hình AIMS-mini phục vụ Lab 02, không phải giao diện người dùng hay hệ thống phân quyền đã triển khai.
