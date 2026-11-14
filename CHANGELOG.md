@@ -1,5 +1,10 @@
 # Changelog — release/lab04
 
+## [1.0.2] - 2026-11-14 (pending annotated release tag)
+
+### Fixed
+- Reject NaN / infinite DVD cost; regression test (Issue #24).
+
 ## [1.0.1] - 2026-11-14 (repaired branch state)
 
 ### Fixed
