@@ -10,6 +10,12 @@ class TestDVD(unittest.TestCase):
         self.assertEqual(disc.category, "")
         self.assertEqual(disc.cost, 0.0)
 
+    def test_reject_nonfinite_cost(self):
+        for invalid in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(invalid=invalid):
+                with self.assertRaises(ValueError):
+                    DigitalVideoDisc("Invalid", cost=invalid)
+
     def test_reject_invalid_price(self):
         with self.assertRaises(ValueError):
             DigitalVideoDisc("Invalid", cost=-1)
