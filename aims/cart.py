@@ -25,6 +25,11 @@ class Cart:
     def total_cost(self):
         return sum(dvd.cost for dvd in self.items)
 
+    def total_cost_with_discount(self, percent=0):
+        """Apply a percentage discount to the cart total."""
+        # Initial draft deliberately exposes an error for Lab 03 bugfix.
+        return self.total_cost() * percent / 100
+
     def print_cart(self):
         """Print each DVD and the order total."""
         if not self.items:
