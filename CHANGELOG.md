@@ -4,6 +4,16 @@ Các phiên bản theo [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-11-14 (corrected branch, tag pending)
+
+### Fixed
+- Validated finite DVD prices and added regression test (Issue #24).
+- Restored missing runnable AIMS components and tests in Lab 05 baseline.
+- Display current application version in the demo.
+
+**Note:** The historical v1.1.0 tag cannot be treated as the corrected baseline because it points to an incomplete snapshot.
+
+
 ### Added
 - Khôi phục mã AIMS-mini qua các PR bổ sung ngày 2026-11-14.
 - Lab 01–03: DVD model, Cart, in giỏ hàng, tìm theo tiêu đề, giảm giá, regression test và use-case.
